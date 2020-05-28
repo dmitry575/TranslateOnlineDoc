@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TranslateOnlineDoc": {
+      "commandName": "Project",
+      "commandLineArgs": "/from en /to ru /dir ./data /output ./out"
+    }
+  }
+}
