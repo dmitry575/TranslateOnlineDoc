@@ -1,6 +1,7 @@
 ﻿using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 
 namespace TranslateOnlineDoc.Elements
@@ -27,7 +28,9 @@ namespace TranslateOnlineDoc.Elements
 
             try
             {
-                Driver.ExecuteScript("window.scrollTo(0,450)"); // if the element is on top.
+                var actions = new Actions(Driver);
+                actions.MoveToElement(select);
+                actions.Perform();
             }
             catch (Exception e)
             {

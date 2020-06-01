@@ -43,22 +43,29 @@ namespace TranslateOnlineDoc.Translates
                     _logger.Error($"Open url failed: {e}");
                 }
 
-                new SelectedElement(driver, "//select[@name='from']", _config.FromLang).Action();
-                _logger.Info($"set lang from: {_config.FromLang}");
+                try
+                {
+                    new SelectedElement(driver, "//select[@name='from']", _config.FromLang).Action();
+                    _logger.Info($"set lang from: {_config.FromLang}");
 
-                new SelectedElement(driver, "//select[@name='to']", _config.ToLang).Action();
-                _logger.Info($"set lang to: {_config.ToLang}");
+                    new SelectedElement(driver, "//select[@name='to']", _config.ToLang).Action();
+                    _logger.Info($"set lang to: {_config.ToLang}");
 
-                new UploadFile(driver, null, _filename).Action();
-                _logger.Info($"set file: {_filename}");
+                    new UploadFile(driver, null, _filename).Action();
+                    _logger.Info($"set file: {_filename}");
 
-                new ButtonWaiteElement(driver, "//input[@id='translation-button']").Action();
-                _logger.Info($"click on button");
+                    new ButtonWaiteElement(driver, "//input[@id='translation-button']").Action();
+                    _logger.Info($"click on button");
 
-                var downloadUrl = new DownloadElement(driver, ".download-link");
+                    var downloadUrl = new DownloadElement(driver, ".download-link");
 
-                downloadUrl.Action();
-                _logger.Info($"downloaded url: {downloadUrl}");
+                    downloadUrl.Action();
+                    _logger.Info($"downloaded url: {downloadUrl}");
+                }
+                catch (Exception e)
+                {
+                    _logger.Info($"unexpected exception in transalte process: {e}");
+                }
             }
         }
         /// <summary>

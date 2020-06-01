@@ -28,7 +28,7 @@ namespace TranslateOnlineDoc.Translates
         /// </summary>
         public void Work()
         {
-            while (_queue.Count>0)
+            while (_queue.Count > 0)
             {
                 var filename = _queue.Dequeue();
                 if (_tasks.Count >= MaxTasks)
@@ -36,7 +36,7 @@ namespace TranslateOnlineDoc.Translates
                     var idx = Task.WaitAny(_tasks.ToArray());
                     _tasks.RemoveAt(idx);
                 }
-                
+
                 _tasks.Add(Task.Run(() => new TranslateFile(filename, _config).Translate()));
                 _logger.Info($"Added file to Task for file: {filename}");
             }

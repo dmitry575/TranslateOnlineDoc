@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
+using TranslateOnlineDoc.Common;
 
 namespace TranslateOnlineDoc.Elements
 {
@@ -17,6 +20,7 @@ namespace TranslateOnlineDoc.Elements
         public override void Action()
         {
             var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
+            wait.PollingInterval = TimeSpan.FromSeconds(20);
             var button = wait.Until(d => d.FindElement(By.XPath(Xpath)));
 
             if (button == null)
@@ -27,8 +31,19 @@ namespace TranslateOnlineDoc.Elements
 
             var display = button.GetCssValue("display");
             Logger.Info($"button display: {display}");
-            if ((button.Displayed && display.Contains("inline") )|| _tryClick > MaxClick)
+
+            if ((button.Displayed && display.Contains("inline")) || _tryClick > MaxClick)
             {
+                // try to scroll to button element
+                try
+                {
+                    Driver.ScrollTo(button);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error($"failed scroll to button {Xpath}. {e}");
+                }
+
                 button.Click();
             }
             else
