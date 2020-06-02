@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using log4net;
 using TranslateOnlineDoc.Configs;
@@ -11,15 +13,19 @@ namespace TranslateOnlineDoc.Translates
     public class TranslateBackgroundHandler
     {
         private readonly Configuration _config;
-        private readonly Queue<string> _queue;
+        private readonly List<string> _files;
         private readonly List<Task> _tasks;
         private static ILog _logger = LogManager.GetLogger(typeof(TranslateBackgroundHandler));
         private const int MaxTasks = 3;
+        private readonly CancellationToken _cancellationToken;
 
-        public TranslateBackgroundHandler(Configuration config, List<string> files)
+
+        public TranslateBackgroundHandler(Configuration config, List<string> files, CancellationToken cancellationToken)
         {
             _config = config;
-            _queue = new Queue<string>(files);
+            _cancellationToken = cancellationToken;
+            _files = files;
+            //_queue = new Queue<string>(files);
             _tasks = new List<Task>();
         }
 
@@ -28,22 +34,22 @@ namespace TranslateOnlineDoc.Translates
         /// </summary>
         public void Work()
         {
-            while (_queue.Count > 0)
+            try
             {
-                var filename = _queue.Dequeue();
-                if (_tasks.Count >= MaxTasks)
-                {
-                    var idx = Task.WaitAny(_tasks.ToArray());
-                    _tasks.RemoveAt(idx);
-                }
+                Parallel.ForEach<string>(_files, new ParallelOptions { CancellationToken = _cancellationToken, MaxDegreeOfParallelism = MaxTasks },
+                    TranslateFile);
 
-                _tasks.Add(Task.Run(() => new TranslateFile(filename, _config).Translate()));
-                _logger.Info($"Added file to Task for file: {filename}");
             }
+            catch (Exception e)
+            {
+                _logger.Error($"translate files parallel failed: {e}");
+            }
+        }
 
-            Task.WaitAll(_tasks.ToArray());
-            _tasks.Clear();
-
+        private void TranslateFile(string filename)
+        {
+            using var t = new TranslateFile(filename, _config);
+            t.Translate();
         }
     }
 }

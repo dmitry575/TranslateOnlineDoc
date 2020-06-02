@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using log4net;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
@@ -12,11 +13,13 @@ namespace TranslateOnlineDoc.Translates
     /// Class for translate one file
     /// open url, upload file, download new file
     /// </summary>
-    public class TranslateFile
+    public class TranslateFile : IDisposable
     {
         private readonly string _filename;
         private readonly Configuration _config;
-        private static ILog _logger = LogManager.GetLogger(typeof(TranslateFile));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(TranslateFile));
+        private FirefoxDriver _driver;
+        private bool _isDisposable = false;
 
         public TranslateFile(string filename, Configuration config)
         {
@@ -29,43 +32,41 @@ namespace TranslateOnlineDoc.Translates
         /// </summary>
         public void Translate()
         {
-            using (var driver = new FirefoxDriver(GetOptions(_config.DirOutput)))
+            _driver = new FirefoxDriver(GetOptions(_config.DirOutput));
+            _driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(25);
+            string url = _config.GetUrlTranslate();
+            Logger.Info($"open url: {url}");
+            try
             {
-                driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(25);
-                string url = _config.GetUrlTranslate();
-                _logger.Info($"open url: {url}");
-                try
-                {
-                    driver.Navigate().GoToUrl(url);
-                }
-                catch (WebDriverException e)
-                {
-                    _logger.Error($"Open url failed: {e}");
-                }
+                _driver.Navigate().GoToUrl(url);
+            }
+            catch (WebDriverException e)
+            {
+                Logger.Error($"Open url failed: {e}");
+            }
 
-                try
-                {
-                    new SelectedElement(driver, "//select[@name='from']", _config.FromLang).Action();
-                    _logger.Info($"set lang from: {_config.FromLang}");
+            try
+            {
+                new SelectedElement(_driver, "//select[@name='from']", _config.FromLang).Action();
+                Logger.Info($"set lang from: {_config.FromLang}");
 
-                    new SelectedElement(driver, "//select[@name='to']", _config.ToLang).Action();
-                    _logger.Info($"set lang to: {_config.ToLang}");
+                new SelectedElement(_driver, "//select[@name='to']", _config.ToLang).Action();
+                Logger.Info($"set lang to: {_config.ToLang}");
 
-                    new UploadFile(driver, null, _filename).Action();
-                    _logger.Info($"set file: {_filename}");
+                new UploadFile(_driver, null, _filename).Action();
+                Logger.Info($"set file: {_filename}");
 
-                    new ButtonWaiteElement(driver, "//input[@id='translation-button']").Action();
-                    _logger.Info($"click on button");
+                new ButtonWaiteElement(_driver, "//input[@id='translation-button']").Action();
+                Logger.Info($"click on button");
 
-                    var downloadUrl = new DownloadElement(driver, ".download-link");
+                var downloadUrl = new DownloadElement(_driver, ".download-link");
 
-                    downloadUrl.Action();
-                    _logger.Info($"downloaded url: {downloadUrl}");
-                }
-                catch (Exception e)
-                {
-                    _logger.Info($"unexpected exception in transalte process: {e}");
-                }
+                downloadUrl.Action();
+                Logger.Info($"downloaded url: {downloadUrl}");
+            }
+            catch (Exception e)
+            {
+                Logger.Info($"unexpected exception in transalte process: {e}");
             }
         }
         /// <summary>
@@ -82,9 +83,23 @@ namespace TranslateOnlineDoc.Translates
                 "text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
             options.SetPreference("browser.helperApps.neverAsk.saveToDisk",
                 "text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
-
             return options;
         }
 
+        public void Dispose()
+        {
+            _isDisposable = true;
+            _driver.Close();
+            _driver.Quit();
+            _driver.Dispose();
+        }
+
+        ~TranslateFile()
+        {
+            if (!_isDisposable)
+            {
+                Dispose();
+            }
+        }
     }
 }

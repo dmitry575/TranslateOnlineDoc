@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using log4net;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Support.UI;
@@ -10,8 +9,6 @@ namespace TranslateOnlineDoc.Elements
 {
     public class DownloadElement : BaseElementAction
     {
-        protected readonly ILog Logger = LogManager.GetLogger(typeof(DownloadElement));
-
         public string UrlDownload { get; private set; }
 
         public DownloadElement(FirefoxDriver driver, string xpath) : base(driver, xpath)

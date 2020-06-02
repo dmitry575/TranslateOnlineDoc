@@ -3,6 +3,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
+using TranslateOnlineDoc.Common;
 
 namespace TranslateOnlineDoc.Elements
 {
@@ -28,9 +29,7 @@ namespace TranslateOnlineDoc.Elements
 
             try
             {
-                var actions = new Actions(Driver);
-                actions.MoveToElement(select);
-                actions.Perform();
+                Driver.ScrollToCenter(select);
             }
             catch (Exception e)
             {
