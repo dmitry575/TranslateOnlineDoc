@@ -32,7 +32,10 @@ namespace TranslateOnlineDoc
             {
                 _logger.Error($"invalid translates files: {e}");
             }
-            finally { _cancellationTokenSource.Dispose(); }
+            finally
+            {
+                _cancellationTokenSource.Dispose();
+            }
 
             _logger.Info("working finished, press any key...");
             Console.Read();

@@ -36,8 +36,12 @@ namespace TranslateOnlineDoc.Translates
         {
             try
             {
-                Parallel.ForEach<string>(_files, new ParallelOptions { CancellationToken = _cancellationToken, MaxDegreeOfParallelism = MaxTasks },
-                    TranslateFile);
+                Parallel.ForEach<string>(_files, new ParallelOptions
+                {
+                    CancellationToken = _cancellationToken,
+                    MaxDegreeOfParallelism = MaxTasks
+                },
+                 TranslateFile);
 
             }
             catch (Exception e)

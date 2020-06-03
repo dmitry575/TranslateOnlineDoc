@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
@@ -9,10 +10,21 @@ namespace TranslateOnlineDoc.Elements
 {
     public class DownloadElement : BaseElementAction
     {
+        private readonly string _downloadPath;
+
+        /// <summary>
+        /// Url downloaded
+        /// </summary>
         public string UrlDownload { get; private set; }
 
-        public DownloadElement(FirefoxDriver driver, string xpath) : base(driver, xpath)
+        /// <summary>
+        /// Fullname file of doenloaded
+        /// </summary>
+        public string FileDownload { get; private set; }
+
+        public DownloadElement(FirefoxDriver driver, string xpath, string downloadPath) : base(driver, xpath)
         {
+            _downloadPath = downloadPath;
         }
 
         /// <summary>
@@ -35,7 +47,6 @@ namespace TranslateOnlineDoc.Elements
             }
 
             UrlDownload = linkElement.GetAttribute("href");
-
             try
             {
                 Driver.ScrollTo(linkElement);
@@ -47,6 +58,27 @@ namespace TranslateOnlineDoc.Elements
 
 
             linkElement.Click();
+
+            // check file downloaded, and rename
+            FileDownload = GetFileName(linkElement);
+
+        }
+
+        /// <summary>
+        /// Get full path of downloaded file
+        /// </summary>
+        /// <param name="linkElement">Url of downloaded file</param>
+        private string GetFileName(IWebElement linkElement)
+        {
+            string src = linkElement.GetAttribute("href");
+            if (string.IsNullOrEmpty(src))
+            {
+                Logger.Warn($"download link has not 'href' attribute");
+                return string.Empty;
+            }
+
+            var fInfo = new FileInfo(src);
+            return Path.Combine(_downloadPath, fInfo.Name);
         }
     }
 }
