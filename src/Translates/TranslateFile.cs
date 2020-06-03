@@ -59,10 +59,10 @@ namespace TranslateOnlineDoc.Translates
                 new ButtonWaiteElement(_driver, "//input[@id='translation-button']").Action();
                 Logger.Info($"click on button");
 
-                var downloadUrl = new DownloadElement(_driver, ".download-link");
+                var downloadUrl = new DownloadElement(_driver, ".download-link", Path.GetFullPath(_config.DirOutput));
 
                 downloadUrl.Action();
-                Logger.Info($"downloaded url: {downloadUrl}");
+                Logger.Info($"downloaded url: {downloadUrl.UrlDownload}, file: {downloadUrl.FileDownload}");
             }
             catch (Exception e)
             {
