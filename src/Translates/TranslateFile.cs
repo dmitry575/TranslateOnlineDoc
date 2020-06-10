@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using log4net;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;

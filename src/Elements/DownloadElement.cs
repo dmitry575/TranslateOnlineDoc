@@ -32,7 +32,7 @@ namespace TranslateOnlineDoc.Elements
         /// </summary>
         public override void Action()
         {
-            var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(25));
+            var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(35));
 
             var blockDownload = wait.Until(d => d.FindElement(By.CssSelector(Xpath)));
             if (blockDownload == null)
