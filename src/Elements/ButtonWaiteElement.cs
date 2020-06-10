@@ -37,7 +37,7 @@ namespace TranslateOnlineDoc.Elements
                 // try to scroll to button element
                 try
                 {
-                    Driver.ScrollTo(button);
+                    Driver.ScrollToCenter(button);
                 }
                 catch (Exception e)
                 {

@@ -11,9 +11,9 @@ namespace TranslateOnlineDoc
 
     class Program
     {
-        const string Version = "1.0.0";
+        const string Version = "1.0.2";
 
-        private static ILog _logger = LogManager.GetLogger(typeof(Program));
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(Program));
         private static CancellationTokenSource _cancellationTokenSource;
         static void Main(string[] args)
         {
@@ -55,8 +55,8 @@ namespace TranslateOnlineDoc
             _logger.Info($"Version: {Version}");
             _logger.Info("");
             _logger.Info("Parameters for using:");
-            _logger.Info("/from - from language translate, for example: en");
-            _logger.Info("/to - to language translate, for example: en");
+            _logger.Info("/from - from language translate, default value en");
+            _logger.Info("/to - to language translate, default value: en");
             _logger.Info("/dir - full directories from witch get all files and try to translate");
             _logger.Info("/output - full directories where will be saving new files");
         }

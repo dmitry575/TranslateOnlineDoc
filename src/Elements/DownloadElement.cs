@@ -32,7 +32,7 @@ namespace TranslateOnlineDoc.Elements
         /// </summary>
         public override void Action()
         {
-            var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(20));
+            var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(25));
 
             var blockDownload = wait.Until(d => d.FindElement(By.CssSelector(Xpath)));
             if (blockDownload == null)
@@ -49,7 +49,7 @@ namespace TranslateOnlineDoc.Elements
             UrlDownload = linkElement.GetAttribute("href");
             try
             {
-                Driver.ScrollTo(linkElement);
+                Driver.ScrollToCenter(linkElement);
             }
             catch (Exception e)
             {

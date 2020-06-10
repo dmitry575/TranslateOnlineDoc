@@ -14,8 +14,7 @@ namespace TranslateOnlineDoc.Translates
     {
         private readonly Configuration _config;
         private readonly List<string> _files;
-        private readonly List<Task> _tasks;
-        private static ILog _logger = LogManager.GetLogger(typeof(TranslateBackgroundHandler));
+        private readonly ILog _logger = LogManager.GetLogger(typeof(TranslateBackgroundHandler));
         private const int MaxTasks = 3;
         private readonly CancellationToken _cancellationToken;
 
@@ -25,8 +24,6 @@ namespace TranslateOnlineDoc.Translates
             _config = config;
             _cancellationToken = cancellationToken;
             _files = files;
-            //_queue = new Queue<string>(files);
-            _tasks = new List<Task>();
         }
 
         /// <summary>
