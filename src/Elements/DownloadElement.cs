@@ -10,6 +10,14 @@ namespace TranslateOnlineDoc.Elements
 {
     public class DownloadElement : BaseElementAction
     {
+        /// <summary>
+        /// How many seconds need wait a download link
+        /// </summary>
+        private const int MaxSecondsWaiting = 60;
+        
+        /// <summary>
+        /// Path where will be save files
+        /// </summary>
         private readonly string _downloadPath;
 
         /// <summary>
@@ -32,7 +40,8 @@ namespace TranslateOnlineDoc.Elements
         /// </summary>
         public override void Action()
         {
-            var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(35));
+            //waiting while translating
+            var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(MaxSecondsWaiting));
 
             var blockDownload = wait.Until(d => d.FindElement(By.CssSelector(Xpath)));
             if (blockDownload == null)
@@ -70,14 +79,14 @@ namespace TranslateOnlineDoc.Elements
         /// <param name="linkElement">Url of downloaded file</param>
         private string GetFileName(IWebElement linkElement)
         {
-            string src = linkElement.GetAttribute("href");
-            if (string.IsNullOrEmpty(src))
+            string href = linkElement.GetAttribute("href");
+            if (string.IsNullOrEmpty(href))
             {
                 Logger.Warn($"download link has not 'href' attribute");
                 return string.Empty;
             }
 
-            var fInfo = new FileInfo(src);
+            var fInfo = new FileInfo(href);
             return Path.Combine(_downloadPath, fInfo.Name);
         }
     }

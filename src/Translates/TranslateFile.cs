@@ -16,12 +16,37 @@ namespace TranslateOnlineDoc.Translates
     /// </summary>
     public class TranslateFile : IDisposable
     {
+        /// <summary>
+        /// How many seconds need wait a load website
+        /// </summary>
+        private const int MaxSecondsWaiting = 60;
+
+        /// <summary>
+        /// Filename fro translate
+        /// </summary>
         private readonly string _filename;
+
+        /// <summary>
+        /// Configuration
+        /// </summary>
         private readonly Configuration _config;
         private static readonly ILog Logger = LogManager.GetLogger(typeof(TranslateFile));
+
+        /// <summary>
+        /// Selenium driver, use FireFox
+        /// </summary>
         private FirefoxDriver _driver;
+
+        /// <summary>
+        /// Is disabled object or not
+        /// </summary>
         private bool _isDisposable = false;
 
+        /// <summary>
+        /// Translate file
+        /// </summary>
+        /// <param name="filename">Filename for translate</param>
+        /// <param name="config">Configuration translate</param>
         public TranslateFile(string filename, Configuration config)
         {
             _filename = filename;
@@ -33,9 +58,17 @@ namespace TranslateOnlineDoc.Translates
         /// </summary>
         public void Translate()
         {
+            // check may be file already translated
+            if (FileTranslatedExists())
+            {
+                Logger.Info("translated file already exists");
+                return;
+            }
+
             _driver = new FirefoxDriver(GetOptions(_config.DirOutput));
-            _driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(25);
+            _driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(MaxSecondsWaiting);
             string url = _config.GetUrlTranslate();
+
             Logger.Info($"open url: {url}");
             try
             {
@@ -70,6 +103,29 @@ namespace TranslateOnlineDoc.Translates
                 Logger.Info($"unexpected exception in transalte process: {e}");
             }
         }
+
+        /// <summary>
+        /// Checking translated file
+        /// </summary>
+        private bool FileTranslatedExists()
+        {
+            var fInfo = new FileInfo(_filename);
+            // result translate file.from.to.extenstion
+
+            var fileResultName =
+                fInfo.Name.Substring(0, fInfo.Name.Length - fInfo.Extension.Length)
+                + "."
+                + _config.FromLang
+                + "."
+                + _config.ToLang
+                + fInfo.Extension;
+
+            var fileName = Path.Combine(_config.DirOutput, fileResultName);
+
+            return File.Exists(fileName);
+
+        }
+
         /// <summary>
         /// Get options for FireFox
         /// </summary>
@@ -90,9 +146,12 @@ namespace TranslateOnlineDoc.Translates
         public void Dispose()
         {
             _isDisposable = true;
-            _driver.Close();
-            _driver.Quit();
-            _driver.Dispose();
+            if (_driver != null)
+            {
+                _driver.Close();
+                _driver.Quit();
+                _driver.Dispose();
+            }
         }
 
         ~TranslateFile()

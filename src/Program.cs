@@ -37,8 +37,7 @@ namespace TranslateOnlineDoc
                 _cancellationTokenSource.Dispose();
             }
 
-            _logger.Info("working finished, press any key...");
-            Console.Read();
+            _logger.Info("working finished...");
         }
 
         private static void CancelHandler(object sender, ConsoleCancelEventArgs e)
