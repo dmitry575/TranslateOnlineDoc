@@ -33,6 +33,7 @@ namespace TranslateOnlineDoc.Translates
         {
             try
             {
+                _logger.Info($"start translate {_files.Count} files");
                 Parallel.ForEach<string>(_files, new ParallelOptions
                 {
                     CancellationToken = _cancellationToken,
@@ -49,8 +50,10 @@ namespace TranslateOnlineDoc.Translates
 
         private void TranslateFile(string filename)
         {
-            using var t = new TranslateFile(filename, _config);
-            t.Translate();
+            using (var t = new TranslateFile(filename, _config))
+            {
+                t.Translate();
+            }
         }
     }
 }

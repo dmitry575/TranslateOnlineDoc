@@ -30,7 +30,7 @@ namespace TranslateOnlineDoc.Translates
                 _logger.Warn($"no files to path: {_config.DirSrc}");
                 return;
             }
-            new TranslateBackgroundHandler(_config,files, _cancellationToken).Work();
+            new TranslateBackgroundHandler(_config, files, _cancellationToken).Work();
         }
     }
 }

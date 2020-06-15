@@ -61,12 +61,14 @@ namespace TranslateOnlineDoc.Translates
             // check may be file already translated
             if (FileTranslatedExists())
             {
-                Logger.Info("translated file already exists");
+                Logger.Info($"translated file already exists: {_filename}");
                 return;
             }
+            Logger.Info($"starting translate file: {_filename}");
 
             _driver = new FirefoxDriver(GetOptions(_config.DirOutput));
             _driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(MaxSecondsWaiting);
+            
             string url = _config.GetUrlTranslate();
 
             Logger.Info($"open url: {url}");

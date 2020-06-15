@@ -14,7 +14,7 @@ namespace TranslateOnlineDoc.Elements
         /// How many seconds need wait a download link
         /// </summary>
         private const int MaxSecondsWaiting = 60;
-        
+
         /// <summary>
         /// Path where will be save files
         /// </summary>
@@ -42,13 +42,22 @@ namespace TranslateOnlineDoc.Elements
         {
             //waiting while translating
             var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(MaxSecondsWaiting));
+            IWebElement blockDownload;
+            try
+            {
+                blockDownload = wait.Until(d => d.FindElement(By.CssSelector(Xpath)));
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"not found element in time: {Xpath}, {e.Message}");
+            }
 
-            var blockDownload = wait.Until(d => d.FindElement(By.CssSelector(Xpath)));
+            blockDownload = Driver.FindElementByCssSelector(Xpath);
+
             if (blockDownload == null)
             {
                 throw new ElementActionException($"not found element for download file by xpath: {Xpath}");
             }
-
             var linkElement = blockDownload.FindElements(By.TagName("a")).FirstOrDefault();
             if (linkElement == null)
             {

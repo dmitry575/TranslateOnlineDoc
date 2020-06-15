@@ -11,7 +11,7 @@ namespace TranslateOnlineDoc
 
     class Program
     {
-        const string Version = "1.0.2";
+        const string Version = "1.0.3";
 
         private static readonly ILog _logger = LogManager.GetLogger(typeof(Program));
         private static CancellationTokenSource _cancellationTokenSource;
