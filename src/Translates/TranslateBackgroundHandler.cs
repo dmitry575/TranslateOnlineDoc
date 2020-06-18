@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using log4net;
 using TranslateOnlineDoc.Configs;
+using TranslateOnlineDoc.Helpers;
 
 namespace TranslateOnlineDoc.Translates
 {
@@ -52,7 +53,10 @@ namespace TranslateOnlineDoc.Translates
         {
             using (var t = new TranslateFile(filename, _config))
             {
-                t.Translate();
+                using (LogicalThreadContext.Stacks["NDC"].Push($"Filename: {filename}"))
+                {
+                    t.Translate();
+                }
             }
         }
     }

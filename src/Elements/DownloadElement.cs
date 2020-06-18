@@ -42,7 +42,7 @@ namespace TranslateOnlineDoc.Elements
         {
             //waiting while translating
             var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(MaxSecondsWaiting));
-            IWebElement blockDownload;
+            IWebElement blockDownload = null;
             try
             {
                 blockDownload = wait.Until(d => d.FindElement(By.CssSelector(Xpath)));
@@ -52,7 +52,7 @@ namespace TranslateOnlineDoc.Elements
                 Logger.Error($"not found element in time: {Xpath}, {e.Message}");
             }
 
-            blockDownload = Driver.FindElementByCssSelector(Xpath);
+            blockDownload ??= Driver.FindElementByCssSelector(Xpath);
 
             if (blockDownload == null)
             {
