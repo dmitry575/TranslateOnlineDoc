@@ -12,4 +12,6 @@ TranslateOnlineDoc is console programm wich has parameters:
 
 /output - full directories where will be saving new files
 
+/timeout - how many seconds wait loading page or another elemnts
+
 The programm using 3 thread for translate.
