@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using log4net;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
@@ -19,7 +17,7 @@ namespace TranslateOnlineDoc.Translates
         /// <summary>
         /// How many seconds need wait a load website
         /// </summary>
-        private const int MaxSecondsWaiting = 60;
+        private int _maxSecondsWaiting;
 
         /// <summary>
         /// Filename fro translate
@@ -30,6 +28,7 @@ namespace TranslateOnlineDoc.Translates
         /// Configuration
         /// </summary>
         private readonly Configuration _config;
+
         private static readonly ILog Logger = LogManager.GetLogger(typeof(TranslateFile));
 
         /// <summary>
@@ -51,6 +50,7 @@ namespace TranslateOnlineDoc.Translates
         {
             _filename = filename;
             _config = config;
+            _maxSecondsWaiting = config.Timeout;
         }
 
         /// <summary>
@@ -67,8 +67,8 @@ namespace TranslateOnlineDoc.Translates
             Logger.Info($"starting translate file: {_filename}");
 
             _driver = new FirefoxDriver(GetOptions(_config.DirOutput));
-            _driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(MaxSecondsWaiting);
-            
+            _driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(_maxSecondsWaiting);
+
             string url = _config.GetUrlTranslate();
 
             Logger.Info($"open url: {url}");
@@ -95,7 +95,7 @@ namespace TranslateOnlineDoc.Translates
                 new ButtonWaiteElement(_driver, "//input[@id='translation-button']").Action();
                 Logger.Info($"click on button");
 
-                var downloadUrl = new DownloadElement(_driver, ".download-link", Path.GetFullPath(_config.DirOutput));
+                var downloadUrl = new DownloadElement(_driver, ".download-link", Path.GetFullPath(_config.DirOutput), _config.Timeout);
 
                 downloadUrl.Action();
                 Logger.Info($"downloaded url: {downloadUrl.UrlDownload}, file: {downloadUrl.FileDownload}");

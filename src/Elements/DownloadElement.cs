@@ -13,7 +13,7 @@ namespace TranslateOnlineDoc.Elements
         /// <summary>
         /// How many seconds need wait a download link
         /// </summary>
-        private const int MaxSecondsWaiting = 60;
+        private readonly int _maxSecondsWaiting;
 
         /// <summary>
         /// Path where will be save files
@@ -26,13 +26,14 @@ namespace TranslateOnlineDoc.Elements
         public string UrlDownload { get; private set; }
 
         /// <summary>
-        /// Fullname file of doenloaded
+        /// Fullname file of download
         /// </summary>
         public string FileDownload { get; private set; }
 
-        public DownloadElement(FirefoxDriver driver, string xpath, string downloadPath) : base(driver, xpath)
+        public DownloadElement(FirefoxDriver driver, string xpath, string downloadPath, int timeout) : base(driver, xpath)
         {
             _downloadPath = downloadPath;
+            _maxSecondsWaiting = timeout;
         }
 
         /// <summary>
@@ -41,7 +42,7 @@ namespace TranslateOnlineDoc.Elements
         public override void Action()
         {
             //waiting while translating
-            var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(MaxSecondsWaiting));
+            var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(_maxSecondsWaiting));
             IWebElement blockDownload = null;
             try
             {

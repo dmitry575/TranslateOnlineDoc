@@ -32,6 +32,12 @@ namespace TranslateOnlineDoc.Configs
         /// </summary>
         public string DirOutput { get; } = "./";
 
+        /// <summary>
+        /// Timeout for load page and another element
+        /// /timeout
+        /// </summary>
+        public int Timeout { get; } = 180;
+
         public Configuration(string[] args)
         {
             if (args != null)
@@ -54,6 +60,13 @@ namespace TranslateOnlineDoc.Configs
 
                         case "/output":
                             DirOutput = args[++i];
+                            break;
+
+                        case "/timeout":
+                            if (int.TryParse(args[++i], out var temp))
+                            {
+                                Timeout = temp;
+                            }
                             break;
                     }
                 }

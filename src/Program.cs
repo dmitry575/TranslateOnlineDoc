@@ -58,6 +58,7 @@ namespace TranslateOnlineDoc
             _logger.Info("/to - to language translate, default value: en");
             _logger.Info("/dir - full directories from witch get all files and try to translate");
             _logger.Info("/output - full directories where will be saving new files");
+            _logger.Info("/timeout - how many seconds wait loading (page, button)");
         }
     }
 }
