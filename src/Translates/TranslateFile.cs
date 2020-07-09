@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using log4net;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
@@ -15,9 +16,19 @@ namespace TranslateOnlineDoc.Translates
     public class TranslateFile : IDisposable
     {
         /// <summary>
+        /// Minimal seconds for pause between action on form
+        /// </summary>
+        private const int MIN_PAUSE_SECONDS = 2;
+
+        /// <summary>
+        /// Maximal seconds for pause between action on form
+        /// </summary>
+        private const int MAX_PAUSE_SECONDS = 10;
+        
+        /// <summary>
         /// How many seconds need wait a load website
         /// </summary>
-        private int _maxSecondsWaiting;
+        private readonly int _maxSecondsWaiting;
 
         /// <summary>
         /// Filename fro translate
@@ -40,6 +51,11 @@ namespace TranslateOnlineDoc.Translates
         /// Is disabled object or not
         /// </summary>
         private bool _isDisposable = false;
+
+        /// <summary>
+        /// Get random seconds for pause
+        /// </summary>
+        private Random _random = new Random();
 
         /// <summary>
         /// Translate file
@@ -66,8 +82,12 @@ namespace TranslateOnlineDoc.Translates
             }
             Logger.Info($"starting translate file: {_filename}");
 
-            _driver = new FirefoxDriver(GetOptions(_config.DirOutput));
+            _driver = new FirefoxDriver(FirefoxDriverService.CreateDefaultService(),GetOptions(_config.DirOutput),TimeSpan.FromSeconds(_maxSecondsWaiting));
             _driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(_maxSecondsWaiting);
+            _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(_maxSecondsWaiting);
+            _driver.Manage().Timeouts().AsynchronousJavaScript = TimeSpan.FromMinutes(_maxSecondsWaiting);
+            
+            _driver.Manage().Window.Maximize();
 
             string url = _config.GetUrlTranslate();
 
@@ -83,17 +103,22 @@ namespace TranslateOnlineDoc.Translates
 
             try
             {
+                new UploadFile(_driver, null, _filename).Action();
+                Logger.Info($"set file: {_filename}");
+
+                Task.Delay(GetPause());
+
                 new SelectedElement(_driver, "//select[@name='from']", _config.FromLang).Action();
                 Logger.Info($"set lang from: {_config.FromLang}");
 
                 new SelectedElement(_driver, "//select[@name='to']", _config.ToLang).Action();
                 Logger.Info($"set lang to: {_config.ToLang}");
 
-                new UploadFile(_driver, null, _filename).Action();
-                Logger.Info($"set file: {_filename}");
-
+                
                 new ButtonWaiteElement(_driver, "//input[@id='translation-button']").Action();
                 Logger.Info($"click on button");
+
+                Task.Delay(GetPause());
 
                 var downloadUrl = new DownloadElement(_driver, ".download-link", Path.GetFullPath(_config.DirOutput), _config.Timeout);
 
@@ -104,6 +129,11 @@ namespace TranslateOnlineDoc.Translates
             {
                 Logger.Info($"unexpected exception in transalte process: {e}");
             }
+        }
+
+        private TimeSpan GetPause()
+        {
+            return TimeSpan.FromSeconds(_random.Next(MAX_PAUSE_SECONDS, MAX_PAUSE_SECONDS));
         }
 
         /// <summary>
@@ -142,6 +172,7 @@ namespace TranslateOnlineDoc.Translates
                 "text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
             options.SetPreference("browser.helperApps.neverAsk.saveToDisk",
                 "text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
+            //options.AddArgument("no-sandbox");
             return options;
         }
 

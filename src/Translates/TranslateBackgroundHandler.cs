@@ -16,7 +16,7 @@ namespace TranslateOnlineDoc.Translates
         private readonly Configuration _config;
         private readonly List<string> _files;
         private readonly ILog _logger = LogManager.GetLogger(typeof(TranslateBackgroundHandler));
-        private const int MaxTasks = 3;
+        private const int MaxTasks = 1;
         private readonly CancellationToken _cancellationToken;
 
 

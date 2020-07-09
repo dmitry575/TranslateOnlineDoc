@@ -9,6 +9,11 @@ namespace TranslateOnlineDoc.Configs
         public const string UrlTranslate = "https://www.onlinedoctranslator.com/{0}/translationform";
 
         /// <summary>
+        /// MAximal working threads
+        /// </summary>
+        private const int MAX_THREADS = 10;
+
+        /// <summary>
         /// From language translate
         /// flag /from
         /// </summary>
@@ -33,10 +38,16 @@ namespace TranslateOnlineDoc.Configs
         public string DirOutput { get; } = "./";
 
         /// <summary>
+        /// Counts of work threads
+        /// /threads
+        /// </summary>
+        public int Threads { get; } = 3;
+
+        /// <summary>
         /// Timeout for load page and another element
         /// /timeout
         /// </summary>
-        public int Timeout { get; } = 180;
+        public int Timeout { get; } = 300;
 
         public Configuration(string[] args)
         {
@@ -66,6 +77,14 @@ namespace TranslateOnlineDoc.Configs
                             if (int.TryParse(args[++i], out var temp))
                             {
                                 Timeout = temp;
+                            }
+                            break;
+
+                        case "/threads":
+                            if (int.TryParse(args[++i], out var tempt))
+                            {
+                                if (tempt > MAX_THREADS) tempt = MAX_THREADS;
+                                Threads = tempt;
                             }
                             break;
                     }
