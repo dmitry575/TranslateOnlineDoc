@@ -46,6 +46,7 @@ namespace TranslateOnlineDoc.Elements
             IWebElement blockDownload = null;
             try
             {
+                wait.PollingInterval = TimeSpan.FromSeconds(20);
                 blockDownload = wait.Until(d => d.FindElement(By.CssSelector(Xpath)));
             }
             catch (Exception e)
@@ -57,6 +58,7 @@ namespace TranslateOnlineDoc.Elements
 
             if (blockDownload == null)
             {
+                Logger.Error($"not found element for download file by xpath: {Xpath}, after wait {_maxSecondsWaiting} seconds");
                 throw new ElementActionException($"not found element for download file by xpath: {Xpath}");
             }
             var linkElement = blockDownload.FindElements(By.TagName("a")).FirstOrDefault();
@@ -75,12 +77,12 @@ namespace TranslateOnlineDoc.Elements
                 Logger.Warn($"windows scroll before download failed: {e}");
             }
 
-
+            Logger.Info($"try to click download file: {Xpath}");
             linkElement.Click();
 
             // check file downloaded, and rename
             FileDownload = GetFileName(linkElement);
-
+            Logger.Info($"Downloaded file {Xpath}, to {FileDownload}");
         }
 
         /// <summary>

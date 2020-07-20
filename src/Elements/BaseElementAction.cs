@@ -1,4 +1,5 @@
-﻿using log4net;
+﻿using System.Threading.Tasks;
+using log4net;
 using OpenQA.Selenium.Firefox;
 
 namespace TranslateOnlineDoc.Elements

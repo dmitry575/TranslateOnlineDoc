@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
-using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using TranslateOnlineDoc.Common;
 
@@ -22,17 +19,23 @@ namespace TranslateOnlineDoc.Elements
             var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
             wait.PollingInterval = TimeSpan.FromSeconds(20);
             var button = wait.Until(d => d.FindElement(By.XPath(Xpath)));
+            Logger.Info($"try find xpath: {Xpath}, {nameof(ButtonWaiteElement)}");
+
 
             if (button == null)
             {
-                Logger.Warn($"Not found element by xpath: {Xpath}, {nameof(ButtonWaiteElement)}");
-                return;
+                button = Driver.FindElement(By.XPath(Xpath));
+                if (button == null)
+                {
+                    Logger.Warn($"Not found element by xpath: {Xpath}, {nameof(ButtonWaiteElement)}");
+                    return;
+                }
             }
 
             var display = button.GetCssValue("display");
             Logger.Info($"button display: {display}");
 
-            if ((button.Displayed && display.Contains("inline")) || _tryClick > MaxClick)
+            if ((button.Displayed && button.Enabled) || _tryClick > MaxClick)
             {
                 // try to scroll to button element
                 try
@@ -49,6 +52,7 @@ namespace TranslateOnlineDoc.Elements
             else
             {
                 _tryClick++;
+                Logger.Info($"try to click to {Xpath}, {_tryClick}");
                 Action();
             }
         }

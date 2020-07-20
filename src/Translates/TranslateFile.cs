@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using log4net;
 using OpenQA.Selenium;
@@ -18,12 +19,12 @@ namespace TranslateOnlineDoc.Translates
         /// <summary>
         /// Minimal seconds for pause between action on form
         /// </summary>
-        private const int MIN_PAUSE_SECONDS = 2;
+        private const int MIN_PAUSE_SECONDS = 10;
 
         /// <summary>
         /// Maximal seconds for pause between action on form
         /// </summary>
-        private const int MAX_PAUSE_SECONDS = 10;
+        private const int MAX_PAUSE_SECONDS = 20;
         
         /// <summary>
         /// How many seconds need wait a load website
@@ -72,7 +73,7 @@ namespace TranslateOnlineDoc.Translates
         /// <summary>
         /// Translate the file and download to new path
         /// </summary>
-        public void Translate()
+        public async Task Translate()
         {
             // check may be file already translated
             if (FileTranslatedExists())
@@ -106,7 +107,7 @@ namespace TranslateOnlineDoc.Translates
                 new UploadFile(_driver, null, _filename).Action();
                 Logger.Info($"set file: {_filename}");
 
-                Task.Delay(GetPause());
+                await Task.Delay(GetPause());
 
                 new SelectedElement(_driver, "//select[@name='from']", _config.FromLang).Action();
                 Logger.Info($"set lang from: {_config.FromLang}");
@@ -118,7 +119,7 @@ namespace TranslateOnlineDoc.Translates
                 new ButtonWaiteElement(_driver, "//input[@id='translation-button']").Action();
                 Logger.Info($"click on button");
 
-                Task.Delay(GetPause());
+                await Task.Delay(GetPause());
 
                 var downloadUrl = new DownloadElement(_driver, ".download-link", Path.GetFullPath(_config.DirOutput), _config.Timeout);
 
@@ -133,7 +134,7 @@ namespace TranslateOnlineDoc.Translates
 
         private TimeSpan GetPause()
         {
-            return TimeSpan.FromSeconds(_random.Next(MAX_PAUSE_SECONDS, MAX_PAUSE_SECONDS));
+            return TimeSpan.FromSeconds(_random.Next(MIN_PAUSE_SECONDS, MAX_PAUSE_SECONDS));
         }
 
         /// <summary>

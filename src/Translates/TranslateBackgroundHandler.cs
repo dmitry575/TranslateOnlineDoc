@@ -39,8 +39,7 @@ namespace TranslateOnlineDoc.Translates
                 {
                     CancellationToken = _cancellationToken,
                     MaxDegreeOfParallelism = MaxTasks
-                },
-                 TranslateFile);
+                }, async (i) => await TranslateFile(i));
 
             }
             catch (Exception e)
@@ -49,13 +48,13 @@ namespace TranslateOnlineDoc.Translates
             }
         }
 
-        private void TranslateFile(string filename)
+        private async Task TranslateFile(string filename)
         {
             using (var t = new TranslateFile(filename, _config))
             {
                 using (LogicalThreadContext.Stacks["NDC"].Push($"Filename: {filename}"))
                 {
-                    t.Translate();
+                    await t.Translate();
                 }
             }
         }
