@@ -33,7 +33,9 @@ namespace TranslateOnlineDoc
             }
             finally
             {
+                _cancellationTokenSource.Cancel();
                 _cancellationTokenSource.Dispose();
+                Logger.Info("working finished...");
             }
 
             Logger.Info("working finished...");

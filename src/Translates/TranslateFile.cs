@@ -56,7 +56,7 @@ namespace TranslateOnlineDoc.Translates
         /// <summary>
         /// Get random seconds for pause
         /// </summary>
-        private Random _random = new Random();
+        private readonly Random _random = new Random();
 
         /// <summary>
         /// Translate file
@@ -82,8 +82,10 @@ namespace TranslateOnlineDoc.Translates
                 return;
             }
             Logger.Info($"starting translate file: {_filename}");
-
-            _driver = new FirefoxDriver(FirefoxDriverService.CreateDefaultService(),GetOptions(_config.DirOutput),TimeSpan.FromSeconds(_maxSecondsWaiting));
+            //FirefoxProfile profile = new FirefoxProfile(@"C:\Users\Dmitry\AppData\Local\Mozilla\Firefox\Profiles\t21lgdab.default-1456481888344");
+            var options = GetOptions(_config.DirOutput);
+           // options.Profile = profile;
+            _driver = new FirefoxDriver(FirefoxDriverService.CreateDefaultService(), options, TimeSpan.FromSeconds(_maxSecondsWaiting));
             _driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(_maxSecondsWaiting);
             _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(_maxSecondsWaiting);
             _driver.Manage().Timeouts().AsynchronousJavaScript = TimeSpan.FromMinutes(_maxSecondsWaiting);
@@ -169,6 +171,7 @@ namespace TranslateOnlineDoc.Translates
             options.SetPreference("browser.download.folderList", 2);
             options.SetPreference("browser.download.manager.showWhenStarting", false);
             options.SetPreference("browser.download.dir", Path.GetFullPath(dirOutput));
+            options.SetPreference("general.useragent.override", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:82.0) Gecko/20100101 Firefox/82.0");
             options.SetPreference("browser.helperApps.neverAsk.openFile",
                 "text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
             options.SetPreference("browser.helperApps.neverAsk.saveToDisk",

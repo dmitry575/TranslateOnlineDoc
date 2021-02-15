@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using log4net;
 using TranslateOnlineDoc.Configs;
-using TranslateOnlineDoc.Helpers;
 
 namespace TranslateOnlineDoc.Translates
 {
